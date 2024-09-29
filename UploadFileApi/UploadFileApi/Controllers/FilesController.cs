@@ -25,8 +25,16 @@ namespace UploadFileApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
-            await fileService.UploadAsync(file);
-            return Ok();
+            var result = await fileService.UploadAsync(file);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("upload-file-with-path")]
+        public async Task<IActionResult> UploadFileWithPath(UploadFileRequestDto dto)
+        {
+            var result = await fileService.UploadAsync(dto);
+            return Ok(result);
         }
 
         [HttpGet]

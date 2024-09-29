@@ -1,11 +1,12 @@
 ﻿using Azure.Storage.Blobs;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
 
 namespace UploadFileApi
 {
     //upload directly to azure
     //https://stackoverflow.com/questions/77062290/can-i-upload-a-file-from-the-users-browser-directly-to-azure-blob-storage-using
+
+    //Performance profiler
+    //https://www.youtube.com/watch?v=FpibK0PKfcI&list=PLReL099Y5nRf2cOurn1hI-gSRxsdbC27C&index=1
     public class FileService
     {
         private readonly IConfiguration configuration;
@@ -58,6 +59,24 @@ namespace UploadFileApi
             return new BlobResponseDto
             {
                 Status = $"File {blob.FileName} Uploaded",
+                Error = false,
+                Blob = new BlobDto
+                {
+                    Uri = blobClient.Uri.AbsoluteUri,
+                    Name = blobClient.Name
+                }
+            };
+        }
+
+        public async Task<BlobResponseDto> UploadAsync(UploadFileRequestDto dto)
+        {
+            BlobClient blobClient = blobContainerClient.GetBlobClient(dto.FileName);
+
+            await blobClient.UploadAsync(dto.FilePath, overwrite: true);
+
+            return new BlobResponseDto
+            {
+                Status = $"File {dto.FileName} Uploaded",
                 Error = false,
                 Blob = new BlobDto
                 {
